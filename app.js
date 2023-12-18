@@ -1,26 +1,28 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const logger = require('morgan')
 const serverConfig = require('./src/config/serverConfig')
 const { httpStatus } = require('./src/constants/constants')
+const authRoutes = require('./src/routes/authRoutes');
+const assetsRoutes = require('./src/routes/assetsRoute');
+const connectDB = require('./src/config/db');
 
-dotenv.config();
+require('dotenv').config();
+connectDB();
 
 const server = serverConfig()
 const httpMsg = httpStatus()
 
+app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(bodyParser.json());
 app.use(logger('dev'))
 app.use(cors());
 
-app.get(`${server.baseUrl}/`, (req, res) => {
-    res.send('Hello, World!');
-});
+app.use(`${server.baseUrl}/auth`,authRoutes);
+app.use(`${server.baseUrl}/assets`,assetsRoutes);
 
 app.use((req, res) => {
     res.status(404).json({ code: 404, error: httpMsg[404] })
