@@ -2,35 +2,6 @@ const Asset = require("../model/asset");
 const { httpStatus } = require('../constants/constants');
 const httpMsg = httpStatus()
 
-const data = [
-    { name: 'EAST ASSETS', description: 'Top level asset', parent: null, system: 'primary', level: 0 },
-    { name: 'A', description: 'A region', parent: 'EAST ASSETS', system: 'primary', level: 1 },
-    { name: 'F', description: 'F region', parent: 'EAST ASSETS', system: 'primary', level: 1 },
-    { name: 'S', description: 'S region', parent: 'EAST ASSETS', system: 'primary', level: 1 },
-    { name: 'S-ADMIN', description: 'S Administration', parent: 'S', system: 'primary', level: 2 },
-    { name: 'S-FIELD', description: 'S Fields', parent: 'S', system: 'primary', level: 2 },
-    { name: 'S-PLANT', description: 'S Facilities', parent: 'S', system: 'primary', level: 2 },
-    { name: 'S-PLANT-SAT', description: 'S Satellite; S', parent: 'S-PLANT', system: 'primary', level: 3 },
-    { name: 'S-PLANT-SAT-BLD', description: 'Buildings; S Satellite; S', parent: 'S-PLANT', system: 'primary', level: 4 },
-    { name: 'S-PLANT-SAT-CMS', description: 'Communications; S Satellite; S', parent: 'S-PLANT', system: 'primary', level: 4 },
-    { name: 'S-PLANT-SAT-COM', description: 'Compression; S Satellite; S', parent: 'S-PLANT', system: 'primary', level: 4 },
-];
-
-const addData = async (req, res) => {
-    try {
-        // for (const item of data) {
-        //     const parentAsset = await Asset.findOne({ name: item.parent });
-        //     if (parentAsset) {
-        //         item.parent = parentAsset._id;
-        //     }
-
-        //     await Asset.create(item);
-        // }
-        res.json('Data inserted successfully.')
-    } catch (error) {
-        res.status(500).json({ message: httpMsg[500], error: error });
-    }
-}
 
 const getData = async (req, res) => {
     try {
@@ -100,10 +71,68 @@ const allData = async (req, res) => {
     }
 }
 
+const addDataByLevel = async (req, res) => {
+    try {
+        const { name, description, parent, system } = req.body;
+        const level = parseInt(req.params.level);
+
+        const newAsset = await Asset.create({ name, description, parent, system, level });
+        res.json(newAsset);
+    } catch (error) {
+        console.error('Error creating asset:', error);
+        res.status(500).json({ message: httpMsg[500], error: error });
+    }
+}
+
+const editData = async (req, res) => {
+    try {
+        const assetId = req.params.assetId;
+        const { name, description, system } = req.body;
+
+        const updatedAsset = await Asset.findByIdAndUpdate(
+            assetId,
+            { name, description, system },
+            { new: true } 
+        );
+        res.json(updatedAsset);
+    } catch (error) {
+        res.status(500).json({ message: httpMsg[500], error: error });
+    }
+}
+
+const deleteAssetAndChildren = async (assetId) => {
+    const asset = await Asset.findById(assetId);
+    if (!asset) {
+        return;
+    }
+    if (asset.children && Array.isArray(asset.children)) {
+        for (const childId of asset.children) {
+            await deleteAssetAndChildren(childId);
+        }
+    }
+    await Asset.findByIdAndDelete(assetId);
+}
+
+const deleteAsset = async (req, res) => {
+    try {
+        const assetId = req.params.assetId;
+
+        // Delete the asset and its children
+        await deleteAssetAndChildren(assetId);
+
+        res.json({ message: 'Asset and its children deleted successfully' });
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: httpMsg[500], error: error });
+    }
+}
+
 
 module.exports = {
-    addData,
     getData,
     allData,
-    drillData
+    drillData,
+    addDataByLevel,
+    editData,
+    deleteAsset
 }
