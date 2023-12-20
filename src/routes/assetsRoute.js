@@ -1,9 +1,10 @@
 const express = require('express')
-const { addData, getData, allData, drillData, addDataByLevel, editData, deleteAsset } = require('../controllers/assetController')
+const { addData, getData, allData, drillData, addDataByLevel, editData, deleteAsset, getAssetById } = require('../controllers/assetController')
 
 const app = express.Router()
 
 app.get('/children/:parentId', getData)
+app.get('/:assetId',getAssetById)
 app.get('/drill-allAsset', drillData)
 app.get('/allAsset', allData)
 app.post('/addAsset/:level', addDataByLevel)

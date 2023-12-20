@@ -71,6 +71,22 @@ const allData = async (req, res) => {
     }
 }
 
+const getAssetById = async (req, res) => {
+    try {
+        const assetId = req.params.assetId;
+        const asset = await Asset.findById(assetId);
+
+        if (asset) {
+            res.json(asset);
+        } else {
+            res.status(404).json({ message: 'Asset not found' });
+        }
+    } catch (error) {
+        console.error('Error retrieving asset:', error);
+        res.status(500).json({ message: httpMsg[500], error: error });
+    }
+}
+
 const addDataByLevel = async (req, res) => {
     try {
         const { name, description, parent, system } = req.body;
@@ -92,7 +108,7 @@ const editData = async (req, res) => {
         const updatedAsset = await Asset.findByIdAndUpdate(
             assetId,
             { name, description, system },
-            { new: true } 
+            { new: true }
         );
         res.json(updatedAsset);
     } catch (error) {
@@ -131,6 +147,7 @@ const deleteAsset = async (req, res) => {
 module.exports = {
     getData,
     allData,
+    getAssetById,
     drillData,
     addDataByLevel,
     editData,
