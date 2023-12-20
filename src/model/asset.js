@@ -6,6 +6,7 @@ const assetSchema = new mongoose.Schema({
     parent: { type: mongoose.Schema.Types.ObjectId, ref: 'Asset' },
     system: String,
     level: Number,
+    children: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Asset' }],
 });
 
 const Asset = mongoose.model('Asset', assetSchema);

@@ -1,5 +1,6 @@
 const Asset = require("../model/asset");
 const { httpStatus } = require('../constants/constants');
+const { default: mongoose } = require("mongoose");
 const httpMsg = httpStatus()
 
 
@@ -143,6 +144,58 @@ const deleteAsset = async (req, res) => {
     }
 }
 
+const duplicateAssetAndChildren = async (originalAssetId, newParentId) => {
+    const originalAsset = await Asset.findById(originalAssetId);
+
+    const newAssetId = new mongoose.Types.ObjectId();
+
+    const duplicatedAsset = new Asset({
+        _id: newAssetId,
+        name: originalAsset.name,
+        description: originalAsset.description,
+        parent: newParentId,
+        system: originalAsset.system,
+        level: originalAsset.level,
+        children: [], // Updated in the recursive call
+    });
+
+    await duplicatedAsset.save();
+
+    // Fetch and duplicate children based on parent-child relationship
+    const children = await Asset.find({ parent: originalAssetId });
+    for (const child of children) {
+        const newChildId = await duplicateAssetAndChildren(child._id, newAssetId);
+        duplicatedAsset.children.push(newChildId);
+    }
+
+    // Update the duplicated asset with the new children
+    await duplicatedAsset.save();
+
+    return newAssetId;
+}
+
+const duplicateAsset = async (req, res) => {
+    try {
+        const originalAssetId = req.params.originalAssetId;
+
+        if (!mongoose.Types.ObjectId.isValid(originalAssetId)) {
+            return res.status(400).json({ message: 'Invalid ObjectId format' });
+        }
+
+        const originalAsset = await Asset.findById(originalAssetId);
+        const newAssetId = await duplicateAssetAndChildren(originalAssetId, originalAsset.parent);
+
+        if (newAssetId) {
+            res.json({ message: 'Asset and its children duplicated successfully', newAssetId });
+        } else {
+            res.status(404).json({ message: 'Asset not found' });
+        }
+    } catch (error) {
+        console.error('Error duplicating asset:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
 
 module.exports = {
     getData,
@@ -151,5 +204,6 @@ module.exports = {
     drillData,
     addDataByLevel,
     editData,
-    deleteAsset
+    deleteAsset,
+    duplicateAsset
 }
