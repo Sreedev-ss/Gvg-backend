@@ -33,13 +33,12 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await AdminModel.findOne({ email });
-
         if (!user || !bcrypt.compareSync(password, user.password)) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
         const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
-        res.json({ token });
+        res.json({ token,status:'Success' });
     } catch (error) {
         res.status(500).json({ message: httpMsg[500], error: error });
     }

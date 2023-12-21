@@ -63,6 +63,35 @@ const drillData = async (req, res) => {
     }
 };
 
+const drillDatabyParent = async (req, res) => {
+    try {
+        const id = req.params?.parentId
+        // Find top-level assets
+        const topAssets = await Asset.find({ _id: id }).select('-__v');
+        const dataWithHierarchy = [];
+
+        // Iterate over top-level assets
+        for (const topAsset of topAssets) {
+            const topLevelData = {
+                _id: topAsset._id,
+                name: topAsset.name,
+                description: topAsset.description,
+                parent: null,  // Top-level asset's parent should be null
+                system: topAsset.system,
+                level: topAsset.level,
+                children: await fetchChildren(topAsset._id), // Recursively fetch children
+            };
+
+            dataWithHierarchy.push(topLevelData);
+        }
+
+        res.json(dataWithHierarchy);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
+
 const allData = async (req, res) => {
     try {
         const data = await Asset.find()
@@ -205,5 +234,6 @@ module.exports = {
     addDataByLevel,
     editData,
     deleteAsset,
-    duplicateAsset
+    duplicateAsset,
+    drillDatabyParent
 }
