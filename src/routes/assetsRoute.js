@@ -13,4 +13,7 @@ app.post('/addAssetImport', addData)
 app.put('/editAsset/:assetId', editData)
 app.delete('/deleteAsset/:assetId', deleteAsset)
 app.post('/duplicate/:originalAssetId',duplicateAsset)
+app.get('/',(req,res)=>{
+    res.send("Server is running")
+})
 module.exports = app
