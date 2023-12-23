@@ -130,6 +130,17 @@ const addDataByLevel = async (req, res) => {
     }
 }
 
+const addData = async (req, res) => {
+    try {
+        const { name, description, parent, system, level } = req.body;
+        const newAsset = await Asset.create({ name, description, parent, system, level });
+        res.json(newAsset);
+    } catch (error) {
+        console.error('Error creating asset:', error);
+        res.status(500).json({ message: httpMsg[500], error: error });
+    }
+}
+
 const editData = async (req, res) => {
     try {
         const assetId = req.params.assetId;
@@ -148,6 +159,7 @@ const editData = async (req, res) => {
 
 const deleteAssetAndChildren = async (assetId) => {
     const asset = await Asset.findById(assetId);
+    console.log(asset)
     if (!asset) {
         return;
     }
@@ -232,6 +244,7 @@ module.exports = {
     getAssetById,
     drillData,
     addDataByLevel,
+    addData,
     editData,
     deleteAsset,
     duplicateAsset,
