@@ -23,6 +23,9 @@ app.use(cors());
 
 app.use(`${server.baseUrl}/auth`,authRoutes);
 app.use(`${server.baseUrl}/assets`,assetsRoutes);
+app.get('/',(req,res)=>{
+    res.send("HI from server")
+})
 
 app.use((req, res) => {
     res.status(404).json({ code: 404, error: httpMsg[404] })
