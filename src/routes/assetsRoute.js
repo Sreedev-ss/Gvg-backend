@@ -13,9 +13,9 @@ app.post('/addAsset/:level', addDataByLevel)
 app.post('/addAssetImport', addData)
 app.put('/editAsset/:assetId', editData)
 app.delete('/deleteAsset/:assetId', deleteAsset)
-app.get('/assetData', async (req, res) => {
+app.delete('/delete-dummy-assetData', async (req, res) => {
     const fieldName = "name";
-    const data = await Asset.find({
+    const data = await Asset.deleteMany({
         [fieldName]: { $exists: false }
     });
     console.log(data)
