@@ -14,16 +14,16 @@ connectDB();
 
 const server = serverConfig()
 const httpMsg = httpStatus()
-
+app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(logger('dev'))
-app.use(cors());
 
-app.use(`${server.baseUrl}/auth`,authRoutes);
-app.use(`${server.baseUrl}/assets`,assetsRoutes);
-app.get('/',(req,res)=>{
+
+app.use(`${server.baseUrl}/auth`, authRoutes);
+app.use(`${server.baseUrl}/assets`, assetsRoutes);
+app.get('/', (req, res) => {
     res.send("HI from server")
 })
 
