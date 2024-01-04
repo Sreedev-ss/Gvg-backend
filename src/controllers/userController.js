@@ -4,10 +4,18 @@ const httpMsg = httpStatus()
 
 require('dotenv').config();
 
+const getUser = async (req, res) => {
+    try {
+        const data = await UserModel.find({})
+        res.json(data)
+    } catch (error) {
+        res.status(500).json({ message: httpMsg[500], error: error });
+    }
+}
+
 const updateUser = async (req, res) => {
     try {
         const id = req.params.id
-
         const { email, password, plant } = req.body;
         const updatedUser = await UserModel.findByIdAndUpdate(
             id,
@@ -35,7 +43,9 @@ const deleteUser = async (req, res) => {
     }
 }
 
+
 module.exports = {
+    getUser,
     updateUser,
     deleteUser
 }
