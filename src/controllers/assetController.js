@@ -139,8 +139,8 @@ const addDataByLevel = async (req, res) => {
 
 const addData = async (req, res) => {
     try {
-        const { name, description, parent, system, level, plant } = req.body;
-        const newAsset = await Asset.create({ name, description, parent, system, level, plant });
+        const data = req.body;
+        const newAsset = await Asset.insertMany(data);
         res.json(newAsset);
     } catch (error) {
         console.error('Error creating asset:', error);
