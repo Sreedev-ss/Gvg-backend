@@ -16,10 +16,10 @@ const getUser = async (req, res) => {
 const updateUser = async (req, res) => {
     try {
         const id = req.params.id
-        const { email, password, plant } = req.body;
+        const { name, email, password, plant } = req.body;
         const updatedUser = await UserModel.findByIdAndUpdate(
             id,
-            { email, password, plant },
+            { name, email, password, plant },
             { new: true }
         )
         res.json(updatedUser)

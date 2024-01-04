@@ -47,7 +47,7 @@ const login = async (req, res) => {
 
 const signUpUser = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { name, email, password } = req.body;
         const existingUser = await UserModel.findOne({ email });
         if (existingUser) {
             return res.status(409).json({ message: "User already exist" });
@@ -55,6 +55,7 @@ const signUpUser = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
         const user = new UserModel({
+            name: name,
             email: email,
             password: hashedPassword,
         });
