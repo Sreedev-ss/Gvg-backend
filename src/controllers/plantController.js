@@ -21,7 +21,7 @@ const createPlant = async (req, res) => {
         })
 
         await plant.save()
-        res.json({ message: 'Plant successfully created' })
+        res.json({ message: 'Plant successfully created', plant })
     } catch (error) {
         res.status(500).json({ message: httpMsg[500], error: error });
     }
