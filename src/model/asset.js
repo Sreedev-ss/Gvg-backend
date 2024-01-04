@@ -6,6 +6,7 @@ const assetSchema = new mongoose.Schema({
     parent: { type: mongoose.Schema.Types.ObjectId, ref: 'Asset' },
     system: String,
     level: Number,
+    plant: { type: mongoose.Schema.Types.ObjectId},
     children: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Asset' }],
 });
 

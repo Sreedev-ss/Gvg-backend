@@ -4,15 +4,16 @@ const Asset = require('../model/asset')
 
 const app = express.Router()
 
-app.get('/children/:parentId', getData)
+app.get('/children/:parentId/:plantId', getData)
 app.get('/asset/:assetId', getAssetById)
-app.get('/drill-allAsset', drillData)
-app.get('/drill-asset/:parentId', drillDatabyParent)
-app.get('/allAsset', allData)
+app.get('/drill-allAsset/:plantId', drillData)
+app.get('/drill-asset/:parentId/:plantId', drillDatabyParent)
+app.get('/allAsset/:plantId', allData)
 app.post('/addAsset/:level', addDataByLevel)
 app.post('/addAssetImport', addData)
 app.put('/editAsset/:assetId', editData)
 app.delete('/deleteAsset/:assetId', deleteAsset)
+
 app.delete('/delete-dummy-assetData', async (req, res) => {
     const fieldName = "name";
     const data = await Asset.deleteMany({

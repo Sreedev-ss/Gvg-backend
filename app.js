@@ -7,6 +7,8 @@ const serverConfig = require('./src/config/serverConfig')
 const { httpStatus } = require('./src/constants/constants')
 const authRoutes = require('./src/routes/authRoutes');
 const assetsRoutes = require('./src/routes/assetsRoute');
+const userRoutes = require('./src/routes/userRoutes');
+const plantRoutes = require('./src/routes/plantRoute')
 const connectDB = require('./src/config/db');
 
 require('dotenv').config();
@@ -23,6 +25,8 @@ app.use(logger('dev'))
 
 app.use(`${server.baseUrl}/auth`, authRoutes);
 app.use(`${server.baseUrl}/assets`, assetsRoutes);
+app.use(`${server.baseUrl}/users`, userRoutes);
+app.use(`${server.baseUrl}/plants`, plantRoutes);
 app.get('/', (req, res) => {
     res.send("HI from server")
 })

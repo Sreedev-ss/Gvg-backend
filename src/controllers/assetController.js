@@ -7,15 +7,16 @@ const httpMsg = httpStatus()
 const getData = async (req, res) => {
     try {
         const parentId = req.params.parentId === 'null' ? null : req.params.parentId;
-        const children = await Asset.find({ parent: parentId });
+        const plantId = req.params.plantId
+        const children = await Asset.find({ parent: parentId, plant: plantId });
         res.json(children);
     } catch (error) {
         res.status(500).json({ message: httpMsg[500], error: error });
     }
 }
 
-const fetchChildren = async (parentId) => {
-    const children = await Asset.find({ parent: parentId }).select('-__v');
+const fetchChildren = async (parentId, plant) => {
+    const children = await Asset.find({ parent: parentId, plant: plant }).select('-__v');
     const childrenWithHierarchy = [];
 
     for (const child of children) {
@@ -25,8 +26,9 @@ const fetchChildren = async (parentId) => {
             description: child.description,
             parent: parentId,  // Correctly assign the parent ID
             system: child.system,
+            plant: child.plant,
             level: child.level,
-            children: await fetchChildren(child._id), // Recursively fetch children
+            children: await fetchChildren(child._id, child.plant), // Recursively fetch children
         };
 
         childrenWithHierarchy.push(childData);
@@ -37,8 +39,9 @@ const fetchChildren = async (parentId) => {
 
 const drillData = async (req, res) => {
     try {
+        const plantId = req.params.plantId
         // Find top-level assets
-        const topAssets = await Asset.find({ parent: null }).select('-__v');
+        const topAssets = await Asset.find({ parent: null, plant: plantId }).select('-__v');
         const dataWithHierarchy = [];
 
         // Iterate over top-level assets
@@ -49,8 +52,9 @@ const drillData = async (req, res) => {
                 description: topAsset.description,
                 parent: null,  // Top-level asset's parent should be null
                 system: topAsset.system,
+                plant: topAsset.plant,
                 level: topAsset.level,
-                children: await fetchChildren(topAsset._id), // Recursively fetch children
+                children: await fetchChildren(topAsset._id, topAsset.plant), // Recursively fetch children
             };
 
             dataWithHierarchy.push(topLevelData);
@@ -66,8 +70,9 @@ const drillData = async (req, res) => {
 const drillDatabyParent = async (req, res) => {
     try {
         const id = req.params?.parentId
+        const plantId = req.params.plantId
         // Find top-level assets
-        const topAssets = await Asset.find({ _id: id }).select('-__v');
+        const topAssets = await Asset.find({ _id: id, plant: plantId }).select('-__v');
         const dataWithHierarchy = [];
 
         // Iterate over top-level assets
@@ -78,8 +83,9 @@ const drillDatabyParent = async (req, res) => {
                 description: topAsset.description,
                 parent: null,  // Top-level asset's parent should be null
                 system: topAsset.system,
+                plant: topAsset.plant,
                 level: topAsset.level,
-                children: await fetchChildren(topAsset._id), // Recursively fetch children
+                children: await fetchChildren(topAsset._id, topAsset.plant), // Recursively fetch children
             };
 
             dataWithHierarchy.push(topLevelData);
@@ -94,7 +100,8 @@ const drillDatabyParent = async (req, res) => {
 
 const allData = async (req, res) => {
     try {
-        const data = await Asset.find()
+        const plantId = req.params.plantId
+        const data = await Asset.find({ plant: plantId })
         res.json(data)
     } catch (error) {
         res.status(500).json({ message: httpMsg[500], error: error });
@@ -119,10 +126,10 @@ const getAssetById = async (req, res) => {
 
 const addDataByLevel = async (req, res) => {
     try {
-        const { name, description, parent, system } = req.body;
+        const { name, description, parent, system, plant } = req.body;
         const level = parseInt(req.params.level);
 
-        const newAsset = await Asset.create({ name, description, parent, system, level });
+        const newAsset = await Asset.create({ name, description, parent, system, level, plant });
         res.json(newAsset);
     } catch (error) {
         console.error('Error creating asset:', error);
@@ -132,8 +139,8 @@ const addDataByLevel = async (req, res) => {
 
 const addData = async (req, res) => {
     try {
-        const { name, description, parent, system, level } = req.body;
-        const newAsset = await Asset.create({ name, description, parent, system, level });
+        const { name, description, parent, system, level, plant } = req.body;
+        const newAsset = await Asset.create({ name, description, parent, system, level, plant });
         res.json(newAsset);
     } catch (error) {
         console.error('Error creating asset:', error);
@@ -197,6 +204,7 @@ const duplicateAssetAndChildren = async (originalAssetId, newParentId) => {
         parent: newParentId,
         system: originalAsset.system,
         level: originalAsset.level,
+        plant: originalAsset.plant,
         children: [], // Updated in the recursive call
     });
 
