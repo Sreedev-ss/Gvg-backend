@@ -9,6 +9,7 @@ const authRoutes = require('./src/routes/authRoutes');
 const assetsRoutes = require('./src/routes/assetsRoute');
 const userRoutes = require('./src/routes/userRoutes');
 const plantRoutes = require('./src/routes/plantRoute')
+const reportRoutes = require('./src/routes/reportRoute')
 const connectDB = require('./src/config/db');
 
 require('dotenv').config();
@@ -24,6 +25,7 @@ app.use(logger('dev'))
 
 
 app.use(`${server.baseUrl}/auth`, authRoutes);
+app.use(`${server.baseUrl}/reports`, reportRoutes);
 app.use(`${server.baseUrl}/assets`, assetsRoutes);
 app.use(`${server.baseUrl}/users`, userRoutes);
 app.use(`${server.baseUrl}/plants`, plantRoutes);

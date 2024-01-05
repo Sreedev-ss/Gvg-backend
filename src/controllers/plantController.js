@@ -14,6 +14,16 @@ const allPlant = async (req, res) => {
     }
 }
 
+const getPlantById = async (req, res) => {
+    try {
+        const plantId = req.params.id
+        const plants = await PlantModal.findOne({ _id: plantId })
+        res.json(plants)
+    } catch (error) {
+        res.status(500).json({ message: httpMsg[500], error: error });
+    }
+}
+
 const createPlant = async (req, res) => {
     try {
         const { name, description } = req.body
@@ -108,5 +118,6 @@ module.exports = {
     createPlant,
     deletePlant,
     updatePlant,
-    clonePlant
+    clonePlant,
+    getPlantById
 }

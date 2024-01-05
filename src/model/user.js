@@ -15,6 +15,10 @@ const userSchema = new mongoose.Schema({
     },
     plant: {
         type: Array,
+    },
+    role:{
+        type:String,
+        default:'User'
     }
 })
 
