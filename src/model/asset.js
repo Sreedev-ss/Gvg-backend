@@ -3,11 +3,11 @@ const mongoose = require('mongoose');
 const assetSchema = new mongoose.Schema({
     name: String,
     description: String,
-    parent: { type: mongoose.Schema.Types.ObjectId, ref: 'Asset' },
+    parent: String,
     system: String,
     level: Number,
     plant: { type: mongoose.Schema.Types.ObjectId},
-    children: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Asset' }],
+    children: Array,
 });
 
 const Asset = mongoose.model('Asset', assetSchema);

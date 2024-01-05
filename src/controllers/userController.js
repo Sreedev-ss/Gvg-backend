@@ -1,6 +1,7 @@
 const { httpStatus } = require('../constants/constants');
 const UserModel = require('../model/user');
 const httpMsg = httpStatus()
+const bcrypt = require('bcrypt')
 
 require('dotenv').config();
 
@@ -17,6 +18,10 @@ const updateUser = async (req, res) => {
     try {
         const id = req.params.id
         const { name, email, password, plant } = req.body;
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            password = await bcrypt.hash(password, salt);
+        }
         const updatedUser = await UserModel.findByIdAndUpdate(
             id,
             { name, email, password, plant },
