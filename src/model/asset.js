@@ -1,12 +1,15 @@
 const mongoose = require('mongoose');
 
 const assetSchema = new mongoose.Schema({
-    name: String,
+    name: {
+        type: String,
+        required: true
+    },
     description: String,
     parent: String,
     system: String,
     level: Number,
-    plant: { type: mongoose.Schema.Types.ObjectId},
+    plant: { type: mongoose.Schema.Types.ObjectId },
     children: Array,
 });
 

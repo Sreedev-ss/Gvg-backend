@@ -1,4 +1,5 @@
 const { httpStatus } = require('../constants/constants');
+const Asset = require('../model/asset');
 const PlantModal = require('../model/plant');
 const httpMsg = httpStatus()
 
@@ -27,10 +28,28 @@ const createPlant = async (req, res) => {
     }
 }
 
+const updatePlant = async (req, res) => {
+    try {
+        const id = req.params.id
+        const { name, description } = req.body;
+        console.log(name, description)
+        const updatedPlant = await PlantModal.findByIdAndUpdate(
+            id,
+            { name, description },
+            { new: true }
+        )
+        res.json(updatedPlant)
+
+    } catch (error) {
+        res.status(500).json({ message: httpMsg[500], error: error });
+    }
+}
+
 const deletePlant = async (req, res) => {
     try {
         const id = req.params.id
         const response = await PlantModal.findByIdAndDelete(id)
+        await Asset.deleteMany({ plant: id })
         res.json({ message: 'Plant deleted successfully', response })
     } catch (error) {
         res.status(500).json({ message: httpMsg[500], error: error });
@@ -40,5 +59,6 @@ const deletePlant = async (req, res) => {
 module.exports = {
     allPlant,
     createPlant,
-    deletePlant
+    deletePlant,
+    updatePlant
 }

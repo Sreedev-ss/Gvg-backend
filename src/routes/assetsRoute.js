@@ -6,13 +6,15 @@ const app = express.Router()
 
 app.get('/children/:parentId/:plantId', getData)
 app.get('/asset/:assetId/:plantId', getAssetById)
+
 app.get('/drill-allAsset/:plantId', drillData)
 app.get('/drill-asset/:parentId/:plantId', drillDatabyParent)
+
 app.get('/allAsset/:plantId', allData)
 app.post('/addAsset/:level', addDataByLevel)
 app.post('/addAssetImport', addData)
 app.put('/editAsset/:assetId', editData)
-app.delete('/deleteAsset/:assetId', deleteAsset)
+app.delete('/deleteAsset/:assetId/:name/:plantId', deleteAsset)
 
 app.delete('/delete-dummy-assetData', async (req, res) => {
     const fieldName = "name";

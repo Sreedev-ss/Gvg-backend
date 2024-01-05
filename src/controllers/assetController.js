@@ -140,8 +140,9 @@ const addDataByLevel = async (req, res) => {
 
 const addData = async (req, res) => {
     try {
-        const data = req.body;
-        const newAsset = await Asset.insertMany(data);
+        const doc = req.body;
+        const filteredData = doc.filter(doc => doc.name !== null);
+        const newAsset = await Asset.insertMany(filteredData);
         res.json(newAsset);
     } catch (error) {
         console.error('Error creating asset:', error);
@@ -165,26 +166,19 @@ const editData = async (req, res) => {
     }
 }
 
-const deleteAssetAndChildren = async (assetId) => {
-    const asset = await Asset.findById(assetId);
-    console.log(asset)
-    if (!asset) {
-        return;
-    }
-    if (asset.children && Array.isArray(asset.children)) {
-        for (const childId of asset.children) {
-            await deleteAssetAndChildren(childId);
-        }
-    }
-    await Asset.findByIdAndDelete(assetId);
+const deleteAssetAndChildren = async (assetId, name) => {
+
 }
 
 const deleteAsset = async (req, res) => {
     try {
         const assetId = req.params.assetId;
-
+        const name = req.params.name
+        const plant = req.params.plantId
         // Delete the asset and its children
-        await deleteAssetAndChildren(assetId);
+        // await deleteAssetAndChildren(assetId, name);
+        await Asset.findByIdAndDelete(assetId)
+        await Asset.deleteMany({ parent: name, plant: plant })
 
         res.json({ message: 'Asset and its children deleted successfully' });
     } catch (error) {
@@ -193,16 +187,16 @@ const deleteAsset = async (req, res) => {
     }
 }
 
-const duplicateAssetAndChildren = async (originalAssetId, newParentId) => {
-    const originalAsset = await Asset.findById(originalAssetId);
+const duplicateAssetAndChildren = async (originalAssetName, newParentName, addCopyOfPrefix = false) => {
+    const originalAsset = await Asset.findOne({ name: originalAssetName });
 
     const newAssetId = new mongoose.Types.ObjectId();
 
     const duplicatedAsset = new Asset({
         _id: newAssetId,
-        name: originalAsset.name,
+        name: `Copy of ${originalAsset.name}`,
         description: originalAsset.description,
-        parent: newParentId,
+        parent: newParentName, // Use the name of the new parent
         system: originalAsset.system,
         level: originalAsset.level,
         plant: originalAsset.plant,
@@ -212,9 +206,9 @@ const duplicateAssetAndChildren = async (originalAssetId, newParentId) => {
     await duplicatedAsset.save();
 
     // Fetch and duplicate children based on parent-child relationship
-    const children = await Asset.find({ parent: originalAssetId });
+    const children = await Asset.find({ parent: originalAssetName });
     for (const child of children) {
-        const newChildId = await duplicateAssetAndChildren(child._id, newAssetId);
+        const newChildId = await duplicateAssetAndChildren(child.name, duplicatedAsset.name);
         duplicatedAsset.children.push(newChildId);
     }
 
@@ -233,7 +227,7 @@ const duplicateAsset = async (req, res) => {
         }
 
         const originalAsset = await Asset.findById(originalAssetId);
-        const newAssetId = await duplicateAssetAndChildren(originalAssetId, originalAsset.parent);
+        const newAssetId = await duplicateAssetAndChildren(originalAsset.name, originalAsset.parent, true);
 
         if (newAssetId) {
             res.json({ message: 'Asset and its children duplicated successfully', newAssetId });
