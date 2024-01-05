@@ -11,6 +11,10 @@ const assetSchema = new mongoose.Schema({
     level: Number,
     plant: { type: mongoose.Schema.Types.ObjectId },
     children: Array,
+    color: {
+        type: String,
+        default: "#3773ca"
+    }
 });
 
 const Asset = mongoose.model('Asset', assetSchema);

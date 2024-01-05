@@ -127,10 +127,10 @@ const getAssetById = async (req, res) => {
 
 const addDataByLevel = async (req, res) => {
     try {
-        const { name, description, parent, system, plant } = req.body;
+        const { name, description, parent, system, plant, color } = req.body;
         const level = parseInt(req.params.level);
 
-        const newAsset = await Asset.create({ name, description, parent, system, level, plant });
+        const newAsset = await Asset.create({ name, description, parent, system, level, plant, color });
         res.json(newAsset);
     } catch (error) {
         console.error('Error creating asset:', error);
@@ -200,6 +200,7 @@ const duplicateAssetAndChildren = async (originalAssetName, newParentName, addCo
         system: originalAsset.system,
         level: originalAsset.level,
         plant: originalAsset.plant,
+        color: originalAsset.color,
         children: [], // Updated in the recursive call
     });
 
@@ -240,6 +241,24 @@ const duplicateAsset = async (req, res) => {
     }
 }
 
+const updateColor = async (req, res) => {
+    try {
+        const plantId = req.params.plantId
+        const level = req.params.level
+        const color = req.body.color
+        const updatedColor = await Asset.updateMany({ plant: plantId, level: level }, {
+            $set: {
+                color: color
+            }
+        })
+        
+        res.json(updatedColor)
+
+    } catch (error) {
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
 
 module.exports = {
     getData,
@@ -251,5 +270,6 @@ module.exports = {
     editData,
     deleteAsset,
     duplicateAsset,
-    drillDatabyParent
+    drillDatabyParent,
+    updateColor
 }
