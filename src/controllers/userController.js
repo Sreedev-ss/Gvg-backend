@@ -38,11 +38,7 @@ const deleteUser = async (req, res) => {
     try {
         const documentId = req.params.id
         const deletedUser = await UserModel.findByIdAndDelete(documentId)
-        if (deletedUser) {
-            res.json(`Document with ID ${documentId} has been deleted:`, deletedUser);
-        } else {
-            res.json(`Document with ID ${documentId} not found.`);
-        }
+        res.json(deletedUser)
     } catch (error) {
         res.status(500).json({ message: httpMsg[500], error: error });
     }
