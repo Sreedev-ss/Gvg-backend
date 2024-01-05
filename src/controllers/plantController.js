@@ -1,7 +1,9 @@
+const { default: mongoose } = require('mongoose');
 const { httpStatus } = require('../constants/constants');
 const Asset = require('../model/asset');
 const PlantModal = require('../model/plant');
 const httpMsg = httpStatus()
+const _ = require('lodash');
 
 const allPlant = async (req, res) => {
     try {
@@ -56,9 +58,55 @@ const deletePlant = async (req, res) => {
     }
 }
 
+const clonePlant = async (req, res) => {
+    try {
+        const originalPlantId = req.params.id;
+        const originalPlant = await PlantModal.findById(originalPlantId);
+
+        if (!originalPlant) {
+            return res.status(404).json({ message: 'Original plant not found' });
+        }
+
+        const clonedPlant = {};
+
+        clonedPlant.name = `Copy of ${originalPlant.name}`;
+        clonedPlant.description = `Copy of ${originalPlant.description}`;
+
+        const savedClonedPlant = new PlantModal({
+            name: clonedPlant.name,
+            description: clonedPlant.description
+        });
+        const data = await savedClonedPlant.save()
+        const originalAssets = await Asset.find({ plant: originalPlant._id });
+
+        const clonedAssets = await cloneAssetsAndUpdatePlant(originalAssets, data._id);
+
+        const savedClonedAssets = await Asset.insertMany(clonedAssets);
+
+        res.json({ plant: savedClonedPlant, assets: savedClonedAssets });
+    } catch (error) {
+        console.error('Error cloning plant and assets:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
+const cloneAssetsAndUpdatePlant = (assets, newPlantId) => {
+    return assets.map(originalAsset => {
+        const clonedAsset = _.cloneDeep(originalAsset);
+        const newAssetId = new mongoose.Types.ObjectId();
+
+        clonedAsset._id = newAssetId;
+        clonedAsset.plant = newPlantId;
+
+        return clonedAsset;
+    });
+};
+
+
 module.exports = {
     allPlant,
     createPlant,
     deletePlant,
-    updatePlant
+    updatePlant,
+    clonePlant
 }
