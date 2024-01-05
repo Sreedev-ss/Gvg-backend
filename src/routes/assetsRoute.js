@@ -5,7 +5,7 @@ const Asset = require('../model/asset')
 const app = express.Router()
 
 app.get('/children/:parentId/:plantId', getData)
-app.get('/asset/:assetId', getAssetById)
+app.get('/asset/:assetId/:plantId', getAssetById)
 app.get('/drill-allAsset/:plantId', drillData)
 app.get('/drill-asset/:parentId/:plantId', drillDatabyParent)
 app.get('/allAsset/:plantId', allData)

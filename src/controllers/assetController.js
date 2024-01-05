@@ -111,7 +111,8 @@ const allData = async (req, res) => {
 const getAssetById = async (req, res) => {
     try {
         const assetId = req.params.assetId;
-        const asset = await Asset.findById(assetId);
+        const plantId = req.params.plantId
+        const asset = await Asset.findOne({ name: assetId, plant: plantId });
 
         if (asset) {
             res.json(asset);

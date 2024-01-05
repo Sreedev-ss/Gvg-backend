@@ -5,6 +5,6 @@ const app = express.Router()
 
 app.get('/all-user',getUser)
 app.put('/edit-user/:id', updateUser)
-app.put('/delete-user/:id', deleteUser)
+app.delete('/delete-user/:id', deleteUser)
 
 module.exports = app;
