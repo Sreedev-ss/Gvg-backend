@@ -52,7 +52,7 @@ const login = async (req, res) => {
                 user:'Admin'
             })
             await report.save()
-            res.json({ token, role: 'admin', status: 'Success' });
+            res.json({ token, role: 'admin',name:admin.name, status: 'Success' });
         } else if (user && bcrypt.compareSync(password, user.password)) {
             const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
             const report = new ReportModel({
@@ -62,7 +62,7 @@ const login = async (req, res) => {
                 user:'User'
             })
             await report.save()
-            res.json({ token, role: 'user', plant: user.plant, status: 'Success' });
+            res.json({ token, role: 'user',name:user.name, plant: user.plant, status: 'Success' });
         } else {
             res.status(401).json({ message: 'Invalid Password' });
         }
