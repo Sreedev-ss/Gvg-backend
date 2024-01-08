@@ -187,8 +187,8 @@ const deleteAsset = async (req, res) => {
     }
 }
 
-const duplicateAssetAndChildren = async (originalAssetName, newParentName, addCopyOfPrefix = false) => {
-    const originalAsset = await Asset.findOne({ name: originalAssetName });
+const duplicateAssetAndChildren = async (originalAssetName, newParentName, plant) => {
+    const originalAsset = await Asset.findOne({ name: originalAssetName, plant: plant });
 
     const newAssetId = new mongoose.Types.ObjectId();
 
@@ -207,9 +207,9 @@ const duplicateAssetAndChildren = async (originalAssetName, newParentName, addCo
     await duplicatedAsset.save();
 
     // Fetch and duplicate children based on parent-child relationship
-    const children = await Asset.find({ parent: originalAssetName });
+    const children = await Asset.find({ parent: originalAssetName,plant:plant });
     for (const child of children) {
-        const newChildId = await duplicateAssetAndChildren(child.name, duplicatedAsset.name);
+        const newChildId = await duplicateAssetAndChildren(child.name, duplicatedAsset.name,duplicatedAsset.plant);
         duplicatedAsset.children.push(newChildId);
     }
 
@@ -228,7 +228,7 @@ const duplicateAsset = async (req, res) => {
         }
 
         const originalAsset = await Asset.findById(originalAssetId);
-        const newAssetId = await duplicateAssetAndChildren(originalAsset.name, originalAsset.parent, true);
+        const newAssetId = await duplicateAssetAndChildren(originalAsset.name, originalAsset.parent, originalAsset.plant);
 
         if (newAssetId) {
             res.json({ message: 'Asset and its children duplicated successfully', newAssetId });
@@ -251,7 +251,7 @@ const updateColor = async (req, res) => {
                 color: color
             }
         })
-        
+
         res.json(updatedColor)
 
     } catch (error) {
