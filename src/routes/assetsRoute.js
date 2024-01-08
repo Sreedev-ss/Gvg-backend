@@ -1,5 +1,5 @@
 const express = require('express')
-const { addData, getData, allData, drillData, addDataByLevel, editData, deleteAsset, getAssetById, duplicateAsset, drillDatabyParent, updateColor } = require('../controllers/assetController')
+const { addData, getData, allData, drillData, addDataByLevel, editData, deleteAsset, getAssetById, duplicateAsset, drillDatabyParent, updateColor, updateBgColor } = require('../controllers/assetController')
 const Asset = require('../model/asset')
 
 const app = express.Router()
@@ -25,6 +25,7 @@ app.delete('/delete-dummy-assetData', async (req, res) => {
     res.json(data)
 })
 app.put('/update-color/:level/:plantId', updateColor)
+app.put('/update-bg-color/:level/:plantId',updateBgColor)
 
 // app.put('/add-color/:plantId', async(req, res) => {
 //     const color = "#3773ca"
@@ -32,6 +33,17 @@ app.put('/update-color/:level/:plantId', updateColor)
 //     const data = await Asset.updateMany({plant:plantId},{
 //         $set:{
 //             color:color
+//         }
+//     })
+//     res.json(data)
+// })
+
+// app.put('/add-bg-color', async(req, res) => {
+//     const color = "#d7ebe6"
+//     const plantId = req.params.plantId
+//     const data = await Asset.updateMany({},{
+//         $set:{
+//             bgcolor:color
 //         }
 //     })
 //     res.json(data)

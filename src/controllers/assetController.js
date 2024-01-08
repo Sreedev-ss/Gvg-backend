@@ -258,6 +258,23 @@ const updateColor = async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 }
+const updateBgColor = async (req, res) => {
+    try {
+        const plantId = req.params.plantId
+        const level = req.params.level
+        const color = req.body.color
+        const updatedColor = await Asset.updateMany({ plant: plantId, level: level }, {
+            $set: {
+                bgcolor: color
+            }
+        })
+
+        res.json(updatedColor)
+
+    } catch (error) {
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
 
 
 module.exports = {
@@ -271,5 +288,6 @@ module.exports = {
     deleteAsset,
     duplicateAsset,
     drillDatabyParent,
-    updateColor
+    updateColor,
+    updateBgColor
 }

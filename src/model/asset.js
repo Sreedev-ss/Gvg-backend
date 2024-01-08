@@ -14,7 +14,12 @@ const assetSchema = new mongoose.Schema({
     color: {
         type: String,
         default: "#3773ca"
+    },
+    bgcolor: {
+        type: String,
+        default: "#d7ebe6"
     }
+
 });
 
 const Asset = mongoose.model('Asset', assetSchema);
